@@ -8,8 +8,9 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 import numpy as np
 import pandas as pd
-from utils.disease import disease_dic
-from utils.fertilizer import fertilizer_dic
+from app.utils.disease import disease_dic
+from app.utils.fertilizer import fertilizer_dic
+from app.utils.model import ResNet9
 import requests
 import config
 import pickle
@@ -17,7 +18,7 @@ import io
 import torch
 from torchvision import transforms
 from PIL import Image
-from utils.model import ResNet9
+
 # ==============================================================================================
 
 # -------------------------LOADING THE TRAINED MODELS -----------------------------------------------
