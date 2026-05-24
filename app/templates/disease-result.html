@@ -1,15 +1,54 @@
 
 {% extends 'layout.html' %} {% block body %}
 
+<section class="pf-center">
+  <div class="pf-analysis">
+    <div class="pf-analysis-header">
+      <div class="pf-app-icon"><span class="fa fa-medkit"></span></div>
+      <div class="pf-analysis-title">Analysis Complete</div>
+      <div class="pf-analysis-subtitle">AI-powered disease detection result</div>
+    </div>
 
-<div class="container py-2 mx-auto my-50 h-10 " style="margin: 5rem;">
-  <div class="row">
-      <div class="col-sm py-2 py-md-3">
-          <div class="card card-body" style="justify-content: center; background-color:#FFE5CC">
-            <p class="text-center" style="color: black; font-size: 22px;">{{ prediction }}</p>
-          </div>
+    <div class="pf-progress-row">
+      <div class="pf-progress-label">
+        <span>Model confidence</span>
+        <span style="color:#16a34a; font-weight:1000;">{{ confidence }}%</span>
       </div>
+      <div class="pf-progress">
+        <div style="width: {{ confidence }}%;"></div>
+      </div>
+    </div>
+
+    <div class="pf-pill-row">
+      <div class="pf-pillbox">
+        <div class="pf-pill-emoji">🌱</div>
+        <div>
+          <div class="k">Plant</div>
+          <div class="v">{{ plant }}</div>
+        </div>
+      </div>
+      <div class="pf-pillbox">
+        <div class="pf-pill-emoji">🦠</div>
+        <div>
+          <div class="k">Condition</div>
+          <div class="v">{{ condition }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-analysis-body">
+      <div class="pf-panel">
+        <div style="color: rgba(11,18,32,0.86); font-weight: 650; letter-spacing: 0.2px; line-height: 1.7;">
+          {{ prediction }}
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-actions">
+      <a class="btn pf-action-btn pf-action-primary" href="{{ url_for('disease_prediction') }}">Analyze Another Plant</a>
+      <a class="btn pf-action-btn pf-action-ghost" href="{{ url_for('home') }}">Home</a>
+    </div>
   </div>
-</div>
+</section>
 {% endblock %}
 <!--blanchedalmond-->

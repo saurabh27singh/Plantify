@@ -1,7 +1,11 @@
 # Importing essential libraries and modules
 
+import os
+import sqlite3
 from markupsafe import Markup
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 import numpy as np
 import pandas as pd
 from utils.disease import disease_dic
@@ -84,21 +88,25 @@ def weather_fetch(city_name):
     :params: city_name
     :return: temperature, humidity
     """
-    api_key = config.weather_api_key
+    api_key = getattr(config, "weather_api_key", "") or ""
     base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
-    complete_url = base_url + "appid=" + api_key + "&q=" + city_name
-    response = requests.get(complete_url)
-    x = response.json()
-
-    if x["cod"] != "404":
-        y = x["main"]
-
-        temperature = round((y["temp"] - 273.15), 2)
-        humidity = y["humidity"]
-        return temperature, humidity
-    else:
+    city_name = (city_name or "").strip()
+    if not city_name or not api_key:
         return None
+
+    complete_url = base_url + "appid=" + api_key + "&q=" + city_name
+    try:
+        response = requests.get(complete_url, timeout=10)
+        x = response.json()
+        if str(x.get("cod")) == "200" and isinstance(x.get("main"), dict):
+            y = x["main"]
+            temperature = round((y["temp"] - 273.15), 2)
+            humidity = y["humidity"]
+            return temperature, humidity
+    except Exception:
+        pass
+    return None
 
 
 def predict_image(img, model=disease_model):
@@ -116,41 +124,177 @@ def predict_image(img, model=disease_model):
     img_u = torch.unsqueeze(img_t, 0)
 
     # Get predictions from model
-    yb = model(img_u)
-    # Pick index with highest probability
-    _, preds = torch.max(yb, dim=1)
+    with torch.no_grad():
+        yb = model(img_u)
+        probs = torch.softmax(yb, dim=1)
+        conf, preds = torch.max(probs, dim=1)
     prediction = disease_classes[preds[0].item()]
-    # Retrieve the class label
-    return prediction
+    confidence = float(conf[0].item())
+    return prediction, confidence
 
 # ===============================================================================================
 # ------------------------------------ FLASK APP -------------------------------------------------
 
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'plantify-secret-key-change-in-production')
+
+# ── Flask-Login ──────────────────────────────────────────────────────────────
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
+login_manager.login_message_category = 'warning'
+
+# ── Gate the app behind authentication ───────────────────────────────────────
+@app.before_request
+def require_login_for_app():
+    """
+    Force authentication before accessing any app page.
+    Allows only auth endpoints + static assets without login.
+    """
+    if current_user.is_authenticated:
+        return None
+
+    # If Flask hasn't matched an endpoint yet, let it 404 naturally.
+    if request.endpoint is None:
+        return None
+
+    allowed_endpoints = {
+        'login',
+        'register',
+        'static',
+    }
+    if request.endpoint in allowed_endpoints:
+        return None
+
+    return redirect(url_for('login', next=request.full_path))
+
+# ── User model ───────────────────────────────────────────────────────────────
+class User(UserMixin):
+    def __init__(self, id, name, email, password_hash):
+        self.id = id
+        self.name = name
+        self.email = email
+        self.password_hash = password_hash
+
+# ── SQLite helpers ────────────────────────────────────────────────────────────
+DB_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'users.db')
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    with get_db() as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                name          TEXT    NOT NULL,
+                email         TEXT    NOT NULL UNIQUE,
+                password_hash TEXT    NOT NULL
+            )
+        ''')
+        conn.commit()
+
+init_db()
+
+def get_user_by_id(user_id):
+    with get_db() as conn:
+        row = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    return User(row['id'], row['name'], row['email'], row['password_hash']) if row else None
+
+def get_user_by_email(email):
+    with get_db() as conn:
+        row = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    return User(row['id'], row['name'], row['email'], row['password_hash']) if row else None
+
+def create_user(name, email, password):
+    pw_hash = generate_password_hash(password)
+    with get_db() as conn:
+        conn.execute('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
+                     (name, email, pw_hash))
+        conn.commit()
+
+@login_manager.user_loader
+def load_user(user_id):
+    return get_user_by_id(int(user_id))
+
+# ── Auth routes ───────────────────────────────────────────────────────────────
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        name  = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        pwd   = request.form.get('password', '')
+        cpwd  = request.form.get('confirm_password', '')
+
+        if not name or not email or not pwd:
+            flash('All fields are required.', 'danger')
+        elif pwd != cpwd:
+            flash('Passwords do not match.', 'danger')
+        elif len(pwd) < 6:
+            flash('Password must be at least 6 characters.', 'danger')
+        elif get_user_by_email(email):
+            flash('An account with that email already exists.', 'danger')
+        else:
+            create_user(name, email, pwd)
+            flash('Account created! Please log in.', 'success')
+            return redirect(url_for('login'))
+    return render_template('register.html', title='Plantify - Register')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        pwd   = request.form.get('password', '')
+        user  = get_user_by_email(email)
+        if user and check_password_hash(user.password_hash, pwd):
+            login_user(user, remember=request.form.get('remember') == 'on')
+            next_page = request.args.get('next')
+            flash(f'Welcome back, {user.name}!', 'success')
+            return redirect(next_page or url_for('home'))
+        flash('Invalid email or password.', 'danger')
+    return render_template('login.html', title='Plantify - Login')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('home'))
 
 # render home page
 
 
 @ app.route('/')
+@login_required
 def home():
-    title = 'CropIQ - Home'
+    title = 'Plantify - Home'
     return render_template('index.html', title=title)
 
 # render crop recommendation form page
 
 
 @ app.route('/crop-recommend')
+@login_required
 def crop_recommend():
-    title = 'CropIQ - Crop Recommendation'
+    title = 'Plantify - Crop Recommendation'
     return render_template('crop.html', title=title)
 
 # render fertilizer recommendation form page
 
 
 @ app.route('/fertilizer')
+@login_required
 def fertilizer_recommendation():
-    title = 'CropIQ - Fertilizer Suggestion'
+    title = 'Plantify - Fertilizer Suggestion'
 
     return render_template('fertilizer.html', title=title)
 
@@ -167,8 +311,9 @@ def fertilizer_recommendation():
 
 
 @ app.route('/crop-predict', methods=['POST'])
+@login_required
 def crop_prediction():
-    title = 'CropIQ - Crop Recommendation'
+    title = 'Plantify - Crop Recommendation'
 
     if request.method == 'POST':
         N = int(request.form['nitrogen'])
@@ -180,13 +325,26 @@ def crop_prediction():
         # state = request.form.get("stt")
         city = request.form.get("city")
 
-        if weather_fetch(city) != None:
-            temperature, humidity = weather_fetch(city)
+        weather = weather_fetch(city)
+        if weather is not None:
+            temperature, humidity = weather
             data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
             my_prediction = crop_recommendation_model.predict(data)
             final_prediction = my_prediction[0]
 
-            return render_template('crop-result.html', prediction=final_prediction, title=title)
+            return render_template(
+                'crop-result.html',
+                prediction=final_prediction,
+                title=title,
+                N=N,
+                P=P,
+                K=K,
+                ph=ph,
+                rainfall=rainfall,
+                city=city,
+                temperature=temperature,
+                humidity=humidity,
+            )
 
         else:
 
@@ -196,8 +354,9 @@ def crop_prediction():
 
 
 @ app.route('/fertilizer-predict', methods=['POST'])
+@login_required
 def fert_recommend():
-    title = 'CropIQ - Fertilizer Suggestion'
+    title = 'Plantify - Fertilizer Suggestion'
 
     crop_name = str(request.form['cropname'])
     N = int(request.form['nitrogen'])
@@ -205,7 +364,9 @@ def fert_recommend():
     K = int(request.form['pottasium'])
     # ph = float(request.form['ph'])
 
-    df = pd.read_csv('Data-processed/fertilizer.csv')
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    fertilizer_csv = os.path.join(basedir, '..', 'Data-processed', 'fertilizer.csv')
+    df = pd.read_csv(fertilizer_csv)
 
     nr = df[df['Crop'] == crop_name]['N'].iloc[0]
     pr = df[df['Crop'] == crop_name]['P'].iloc[0]
@@ -234,14 +395,23 @@ def fert_recommend():
 
     response = Markup(str(fertilizer_dic[key]))
 
-    return render_template('fertilizer-result.html', recommendation=response, title=title)
+    return render_template(
+        'fertilizer-result.html',
+        recommendation=response,
+        title=title,
+        crop_name=crop_name,
+        N=N,
+        P=P,
+        K=K,
+    )
 
 # render disease prediction result page
 
 
 @app.route('/disease-predict', methods=['GET', 'POST'])
+@login_required
 def disease_prediction():
-    title = 'CropIQ - Disease Detection'
+    title = 'Plantify - Disease Detection'
 
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -252,10 +422,21 @@ def disease_prediction():
         try:
             img = file.read()
 
-            prediction = predict_image(img)
+            pred_label, confidence = predict_image(img)
+            advice_html = Markup(str(disease_dic[pred_label]))
 
-            prediction = Markup(str(disease_dic[prediction]))
-            return render_template('disease-result.html', prediction=prediction, title=title)
+            # label format: "Apple___Cedar_apple_rust"
+            plant = pred_label.split("___")[0].replace("_", " ")
+            condition = pred_label.split("___")[1].replace("_", " ") if "___" in pred_label else pred_label
+
+            return render_template(
+                'disease-result.html',
+                prediction=advice_html,
+                title=title,
+                plant=plant,
+                condition=condition,
+                confidence=round(confidence * 100, 1),
+            )
         except:
             pass
     return render_template('disease.html', title=title)
@@ -263,4 +444,5 @@ def disease_prediction():
 
 # ===============================================================================================
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", "5002"))
+    app.run(host="127.0.0.1", port=port, debug=True, use_reloader=False)

@@ -1,162 +1,151 @@
 {% extends 'layout.html' %} {% block body %}
 
-<style>
+<section class="pf-page">
+  <div class="container pf-container">
 
- html body{
-  background-image: rgb(100, 0, 170);
- }
-  
- .adi {
-  background-image: url("{{ url_for('static', filename='images/bg1.jpg') }}");
-  background-size: cover;
-  background-position: center;
- 
-  padding: 20px;
-  
-}
-.form-group{
-  color:white;
-}
-
-  
-</style>
-<!--Form Section-->
-
-
-<div class="adi">
-<h2 style="text-align: center; margin-top: 40px; color: black">
-  <b>Determine which crop is best to plant on your property</b>
-</h2>
-<br />
-
-
-
-
-<div style="width: 600px; height: 50rem; margin: 0px auto; color: black; border-radius: 25px; padding: 10px 10px;">
-  <form method="POST" action="{{ url_for('crop_prediction') }}">
-  
-    <div class="row">
-      <div class="col-md-6">
-    <div class="form-group">
-      <label for="Nitrogen" style="font-size: 17px"><b>Nitrogen</b></label>
-      <input
-        type="number"
-        class="form-control"
-        id="Nitrogen"
-        name="nitrogen"
-        placeholder="Enter the value (example:50)"
-        style="font-weight: bold"
-        required
-      />
+    <div class="pf-hero text-center">
+      <div class="pf-pill mb-3">ML-Powered</div>
+      <h1 class="mb-2">Find the best <span style="color:#22c55e;">Crop</span> for your field</h1>
+      <p class="mx-auto" style="max-width: 780px;">
+        Enter your soil properties and location. We combine <strong style="color:#22c55e;">live weather data</strong>
+        with a RandomForest model trained on 2,200 samples to recommend the ideal crop.
+      </p>
     </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="card pf-card">
+          <div class="card-body p-0 overflow-hidden">
+            <form class="pf-form" method="POST" action="{{ url_for('crop_prediction') }}">
+
+              <!-- Section 1: Soil Nutrients -->
+              <div class="pf-form-section">
+                <div class="pf-form-section-header">
+                  <div class="pf-form-section-icon">🌱</div>
+                  <div>
+                    <div class="pf-form-section-label">Soil Nutrients</div>
+                    <div class="pf-form-section-sub">Measured in kg per hectare</div>
+                  </div>
+                </div>
+                <div class="px-3 pb-3">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="Nitrogen">
+                          NITROGEN (N)
+                          <span class="pf-input-hint">0–140</span>
+                        </label>
+                        <input type="number" class="form-control" id="Nitrogen" name="nitrogen"
+                          placeholder="e.g. 50" min="0" max="140" required />
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="Phosphorous">
+                          PHOSPHORUS (P)
+                          <span class="pf-input-hint">0–145</span>
+                        </label>
+                        <input type="number" class="form-control" id="Phosphorous" name="phosphorous"
+                          placeholder="e.g. 50" min="0" max="145" required />
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="Pottasium">
+                          POTASSIUM (K)
+                          <span class="pf-input-hint">0–205</span>
+                        </label>
+                        <input type="number" class="form-control" id="Pottasium" name="pottasium"
+                          placeholder="e.g. 50" min="0" max="205" required />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pf-divider" style="background:rgba(255,255,255,0.10); margin:0;"></div>
+
+              <!-- Section 2: Soil Properties -->
+              <div class="pf-form-section">
+                <div class="pf-form-section-header">
+                  <div class="pf-form-section-icon">💧</div>
+                  <div>
+                    <div class="pf-form-section-label">Soil Properties</div>
+                    <div class="pf-form-section-sub">pH &amp; annual rainfall</div>
+                  </div>
+                </div>
+                <div class="px-3 pb-3">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="ph">
+                          PH LEVEL
+                          <span class="pf-input-hint">3.5–9.9</span>
+                        </label>
+                        <input type="number" step="0.01" class="form-control" id="ph" name="ph"
+                          placeholder="e.g. 6.5" min="3.5" max="9.9" required />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="Rainfall">
+                          RAINFALL
+                          <span class="pf-input-hint">20–300 mm/yr</span>
+                        </label>
+                        <input type="number" step="0.01" class="form-control" id="Rainfall" name="rainfall"
+                          placeholder="e.g. 200" min="20" max="300" required />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pf-divider" style="background:rgba(255,255,255,0.10); margin:0;"></div>
+
+              <!-- Section 3: Location -->
+              <div class="pf-form-section">
+                <div class="pf-form-section-header">
+                  <div class="pf-form-section-icon">📍</div>
+                  <div>
+                    <div class="pf-form-section-label">Location</div>
+                    <div class="pf-form-section-sub">Used to fetch live temperature &amp; humidity</div>
+                  </div>
+                </div>
+                <div class="px-3 pb-4">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="sts">STATE</label>
+                        <select onchange="print_city('state', this.selectedIndex);" id="sts" name="stt"
+                          class="form-control" required></select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="state">CITY</label>
+                        <select id="state" class="form-control" name="city" required></select>
+                        <script language="javascript">print_state("sts");</script>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pf-divider" style="background:rgba(255,255,255,0.10); margin:0;"></div>
+
+              <div class="px-3 py-4 d-flex justify-content-center">
+                <button type="submit" class="btn pf-btn pf-btn-primary" style="min-width:260px; font-size:15px;">
+                  🌾 Get Crop Recommendation
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-
-  <div class="col-md-6">
-    <div class="form-group">
-      <label for="Phosphorous" style="font-size: 17px"
-        ><b>Phosphorous</b></label
-      >
-      <input
-        type="number"
-        class="form-control"
-        id="Phosphorous"
-        name="phosphorous"
-        placeholder="Enter the value (example:50)"
-        style="font-weight: bold"
-        required
-      />
-    </div>
-  </div>
-</div>
-
-
-<div class="row">
-  <div class="col-md-6">
-    <div class="form-group">
-      <label for="Pottasium" style="font-size: 17px"><b>Pottasium</b></label>
-      <input
-        type="number"
-        class="form-control"
-        id="Pottasium"
-        name="pottasium"
-        placeholder="Enter the value (example:50)"
-        style="font-weight: bold"
-        required
-      />
-    </div>
-  </div>
-
-  <div class="col-md-6">
-    <div class="form-group">
-      <label for="ph" style="font-size: 17px"><b>ph level</b></label>
-      <input
-        type="number"
-        step="0.01"
-        class="form-control"
-        id="ph"
-        name="ph"
-        placeholder="Enter the value"
-        style="font-weight: bold"
-        required
-      />
-    </div>
-  </div>
-</div>
-
-
-    <div class="form-group">
-      <label for="Rainfall" style="font-size: 17px"><b>Rainfall (in mm)</b></label>
-      <input
-        type="number"
-        step="0.01"
-        class="form-control"
-        id="Rainfall"
-        name="rainfall"
-        placeholder="Enter the value"
-        style="font-weight: bold"
-        required
-      />
-    </div>
-    <div class="form-group">
-      <label for="State" style="font-size: 17px "><b>State</b></label>
-      <select
-        onchange="print_city('state', this.selectedIndex);"
-        id="sts"
-        name="stt"
-        class="form-control"
-        style="font-weight: bold; color: black;"
-        
-        required
-      ></select>
-      <br />
-      <label for="City" style="font-size: 17px"><b>City</b></label>
-      <select
-        id="state"
-        class="form-control"
-        name="city"
-        style="font-weight: bold; color: black;"
-        required
-      ></select>
-      <script language="javascript">
-        print_state("sts");
-      </script>
-    </div>
-
-    <div class="d-flex justify-content-center">
-      <button
-        type="submit"
-        class="btn btn-info"
-        style="color: black; font-weight: bold; width: 130px; height:50px; border-radius:12px; font-size: 21px;"
-      >
-        Predict
-      </button>
-    </div>
-  </form>
-</div>
-</div>
-
-
-
-<!-- Form section -->
+</section>
 
 {% endblock %}

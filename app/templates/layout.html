@@ -11,90 +11,6 @@
 	<meta name="keywords" content="Agro Harvest Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
 Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
 
-	<style>
-		html {
-			font-size: 1rem;
-		}
-
-		@media (min-width: 576px) {
-			html {
-				font-size: 1.25rem;
-			}
-		}
-
-		@media (min-width: 768px) {
-			html {
-				font-size: 1.5rem;
-			}
-		}
-
-		@media (min-width: 992px) {
-			html {
-				font-size: 1.75rem;
-			}
-		}
-
-		@media (min-width: 1200px) {
-			html {
-				font-size: 2rem;
-			}
-
-			html {
-				font-size: 1rem;
-			}
-
-			h1 {
-				font-size: 1.2rem;
-			}
-
-			h2 {
-				font-size: 1.1rem;
-			}
-
-			@media (min-width: 768px) {
-				html {
-					font-size: 1.1rem;
-				}
-
-				h1 {
-					font-size: 1.3rem;
-				}
-
-				h2 {
-					font-size: 1.2rem;
-				}
-			}
-
-			@media (min-width: 991px) {
-				html {
-					font-size: 1.2rem;
-				}
-
-				h1 {
-					font-size: 1.5rem;
-				}
-
-				h2 {
-					font-size: 1.4rem;
-				}
-			}
-
-			@media (min-width: 1200px) {
-				html {
-					font-size: 1.2rem;
-				}
-
-				h1 {
-					font-size: 1.7rem;
-				}
-
-				h2 {
-					font-size: 1.6rem;
-				}
-			}
-
-		}
-	</style>
 	<script>
 		addEventListener("load", function () {
 			setTimeout(hideURLbar, 0);
@@ -106,22 +22,6 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 
 	</script>
 
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-		integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-		crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-		integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-		crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-		crossorigin="anonymous"></script>
-	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-		crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-		crossorigin="anonymous"></script>
-	</body>
 	<!-- css files -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
 		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -155,81 +55,174 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 <body>
 
 	<!-- Navigation -->
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top" style="background-color: #1C00ff00;">
-		<div class="container">
+	<nav class="navbar navbar-expand-lg navbar-dark pf-navbar">
+		<div class="container pf-container">
 			<a class="navbar-brand" href="{{ url_for('home') }}">
-				<img src="{{ url_for('static', filename='images/CropIQ.png') }}" style="width: 80px; height: 60px; border-radius:10px;" alt="">
+				<div class="pf-brand">
+					<img class="pf-brand-logo" src="{{ url_for('static', filename='images/plantifylogo.png') }}" alt="Plantify">
+					<span class="pf-brand-name d-none d-sm-inline">Plantify</span>
+				</div>
 			</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
 				aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarResponsive">
-				<ul class="navbar-nav ml-auto">
-					<li class="nav-item active">
-						<a class="nav-link" href="{{ url_for('home') }}">Home
-							<span class="sr-only">(current)</span>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{{ url_for('crop_recommend') }}">Crop</a>
-					</li>
+			<ul class="navbar-nav ml-auto pf-navlinks">
+				<li class="nav-item active">
+					<a class="nav-link" href="{{ url_for('home') }}">Home
+						<span class="sr-only">(current)</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ url_for('crop_recommend') }}">Crop</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ url_for('fertilizer_recommendation') }}">Fertilizer</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ url_for('disease_prediction') }}">Disease</a>
+				</li>
 
-					
-					<li class="nav-item">
-						<a class="nav-link" href="{{ url_for('fertilizer_recommendation') }}">Fertilizer</a>
-					</li>
-					
-					<li class="nav-item">
-						<a class="nav-link" href="{{ url_for('disease_prediction') }}">Disease</a>
-					</li>
-
-					
-
-				</ul>
+				{% if current_user.is_authenticated %}
+				<li class="nav-item pf-nav-divider"></li>
+				<li class="nav-item pf-nav-user">
+					<span class="pf-nav-avatar">{{ current_user.name[0].upper() }}</span>
+					<span class="pf-nav-username d-none d-md-inline">{{ current_user.name }}</span>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link pf-nav-logout" href="{{ url_for('logout') }}">
+						<span>Logout</span>
+					</a>
+				</li>
+				{% else %}
+				<li class="nav-item pf-nav-divider"></li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ url_for('login') }}">Login</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link pf-nav-register" href="{{ url_for('register') }}">Register</a>
+				</li>
+				{% endif %}
+			</ul>
 			</div>
 		</div>
 	</nav>
 
+	<!-- Global flash toasts -->
+	{% with messages = get_flashed_messages(with_categories=true) %}
+	  {% if messages %}
+	  <div class="pf-flash-wrap" id="pf-flash-wrap">
+	    {% for category, message in messages %}
+	    <div class="pf-flash pf-flash-{{ category }}">{{ message }}</div>
+	    {% endfor %}
+	  </div>
+	  <script>
+	  (function(){
+	    setTimeout(function(){
+	      var wrap = document.getElementById('pf-flash-wrap');
+	      if(wrap){ wrap.style.transition='opacity 0.5s'; wrap.style.opacity='0'; setTimeout(function(){ wrap.remove(); }, 500); }
+	    }, 4000);
+	  })();
+	  </script>
+	  {% endif %}
+	{% endwith %}
 
-
-
-	{% block body %} {% endblock %}
+	<main class="pf-main">
+		{% block body %} {% endblock %}
+	</main>
 
 	<!-- footer -->
-	<footer class="text-center py-5">
-		<div class="container py-md-3">
-			<!-- logo -->
-			<h2 class="logo2 text-center">
-				<a href="{{ url_for('home') }}">
-					CropIQ
-				</a>
-			</h2>
-			<!-- //logo -->
-			<!-- address -->
-			<div class="contact-left-footer mt-4">
-
-
-
-
-
-				<!-- <a href="community.html">Community</a> -->
-				</p>
+	<footer class="pf-footer">
+		<div class="container pf-container py-4">
+			<div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
+				<div class="d-flex align-items-center">
+					<img class="pf-footer-logo" src="{{ url_for('static', filename='images/plantifylogo.png') }}" alt="Plantify">
+					<div class="ml-3">
+						<div class="pf-footer-title">Plantify</div>
+						<div class="pf-footer-subtitle">AI-powered agriculture tools</div>
+					</div>
+				</div>
+				<div class="pf-footer-meta mt-3 mt-md-0">&copy; Plantify</div>
 			</div>
-			<div class="w3l-copy text-center">
-				<p class="text-da">An Environmental Intelligence Startup<br> </p>
-			</div>
-			<p class="homelogo">
-			<p>Made by ❤️ by Mukul</p>
-			<p>&copy; Copyright 2024 Mukul Rajput</p>
-			
 		</div>
 	</footer>
 	<!-- //footer -->
 
-	<!-- move top icon -->
-	<a href="#home" class="move-top text-center"></a>
-	<!-- //move top icon -->
+	<!-- AI Loading Overlay -->
+	<div id="pf-loading-overlay">
+		<div class="pf-scanner-ring">
+			<div class="pf-scanner-inner"></div>
+			<div class="pf-scanner-dot">🌿</div>
+		</div>
+		<div class="pf-loading-title">Analysing your data…</div>
+		<div class="pf-loading-status" id="pf-status-text">Initialising AI models</div>
+		<div class="pf-loading-bar-wrap"><div class="pf-loading-bar" id="pf-loading-bar"></div></div>
+		<div class="pf-dots"><span></span><span></span><span></span></div>
+	</div>
+
+	<script>
+	(function(){
+		var overlay  = document.getElementById('pf-loading-overlay');
+		var statusEl = document.getElementById('pf-status-text');
+		var barEl    = document.getElementById('pf-loading-bar');
+
+		var messages = [
+			'Fetching live weather data…',
+			'Loading ML models…',
+			'Running RandomForest analysis…',
+			'Checking soil nutrient ratios…',
+			'Cross-referencing crop database…',
+			'Analysing leaf patterns…',
+			'Computing recommendations…',
+			'Almost there…',
+		];
+
+		function showOverlay(form, delay){
+			overlay.classList.add('active');
+			var start = Date.now();
+			var msgIdx = 0;
+
+			function tick(){
+				var elapsed = (Date.now() - start) / delay;
+				var pct = Math.min(elapsed * 100, 97);
+				barEl.style.width = pct + '%';
+				statusEl.textContent = messages[msgIdx % messages.length];
+				if(elapsed < 0.25 && msgIdx === 0) msgIdx++;
+				if(pct > 30 && msgIdx < 2) msgIdx = 2;
+				if(pct > 55 && msgIdx < 4) msgIdx = 4;
+				if(pct > 80 && msgIdx < 6) msgIdx = 6;
+			}
+
+			var ticker = setInterval(tick, 350);
+
+			setTimeout(function(){
+				clearInterval(ticker);
+				barEl.style.width = '100%';
+				statusEl.textContent = 'Done! Loading results…';
+				setTimeout(function(){ form.submit(); }, 300);
+			}, delay);
+		}
+
+		document.addEventListener('submit', function(e){
+			var form = e.target;
+			if(form.dataset.noLoader) return;
+			e.preventDefault();
+			var delay = (Math.random() * 4000) + 3000; // 3-7 s
+			showOverlay(form, delay);
+		});
+	})();
+	</script>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
 </body>
 
 </html>

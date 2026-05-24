@@ -1,174 +1,159 @@
 {% extends 'layout.html' %} {% block body %}
 
-<style>
-  html body {
-    background-color: rgb(206, 206, 228);
-  }
+<section class="pf-page">
+  <div class="container pf-container">
 
- <!--
-  .mukul {
-   background-image: url("{{ url_for('static', filename='images/fertilizer.jpg') }}");  
-    background-size: cover;
-    background-position: center;
-   
-    padding: 20px;
-  }
--->
-  .form-group{
-    color:black;
-  }
-  
+    <div class="pf-hero text-center">
+      <div class="pf-pill mb-3">Rule-Based AI</div>
+      <h1 class="mb-2">Optimise your <span style="color:#22c55e;">Soil Nutrition</span></h1>
+      <p class="mx-auto" style="max-width: 760px;">
+        We compare your N, P, K against ideal targets for your crop
+        and identify the most deficient or excess nutrient to recommend the right fertilizer.
+      </p>
+    </div>
 
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="card pf-card">
+          <div class="card-body p-0 overflow-hidden">
+            <form class="pf-form" method="POST" action="{{ url_for('fert_recommend') }}" id="fert-form">
+              <input type="hidden" name="cropname" id="cropname-hidden" value="">
 
+              <!-- NPK Section -->
+              <div class="pf-form-section">
+                <div class="pf-form-section-header">
+                  <div class="pf-form-section-icon">🧪</div>
+                  <div>
+                    <div class="pf-form-section-label">Soil Nutrients</div>
+                    <div class="pf-form-section-sub">Enter your current NPK levels (kg/ha)</div>
+                  </div>
+                </div>
+                <div class="px-3 pb-3">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label style="color:#22c55e;">● NITROGEN</label>
+                        <input type="number" class="form-control" id="Nitrogen" name="nitrogen"
+                          placeholder="e.g. 50" required />
+                        <div class="pf-input-hint">kg/ha · max 140</div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label style="color:#38bdf8;">● PHOSPHORUS</label>
+                        <input type="number" class="form-control" id="Phosphorous" name="phosphorous"
+                          placeholder="e.g. 50" required />
+                        <div class="pf-input-hint">kg/ha · max 145</div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label style="color:#fbbf24;">● POTASSIUM</label>
+                        <input type="number" class="form-control" id="Pottasium" name="pottasium"
+                          placeholder="e.g. 50" required />
+                        <div class="pf-input-hint">kg/ha · max 205</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
+              <div class="pf-divider" style="background:rgba(255,255,255,0.10); margin:0;"></div>
 
+              <!-- Crop Grid -->
+              <div class="pf-form-section">
+                <div class="pf-form-section-header">
+                  <div class="pf-form-section-icon">🌾</div>
+                  <div>
+                    <div class="pf-form-section-label">Select your crop</div>
+                    <div class="pf-form-section-sub" id="selected-crop-label">None selected</div>
+                  </div>
+                </div>
+                <div class="px-3 pb-3">
+                  <div class="pf-crop-grid" id="crop-grid">
+                    {% set crops = [
+                      ('rice','🌾'),('maize','🌽'),('chickpea','🟡'),('kidneybeans','🫘'),
+                      ('pigeonpeas','🟤'),('mothbeans','🫛'),('mungbean','💚'),('blackgram','⚫'),
+                      ('lentil','🟠'),('pomegranate','🍎'),('banana','🍌'),('mango','🥭'),
+                      ('grapes','🍇'),('watermelon','🍉'),('muskmelon','🍈'),('apple','🍏'),
+                      ('orange','🍊'),('papaya','🧡'),('coconut','🥥'),('cotton','🤍'),
+                      ('jute','🌿'),('coffee','☕')
+                    ] %}
+                    {% for name, emoji in crops %}
+                    <div class="pf-crop-tile" data-crop="{{ name }}" onclick="selectCrop(this)">
+                      <div class="emoji">{{ emoji }}</div>
+                      <div class="name">{{ name }}</div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
 
+              <div class="pf-divider" style="background:rgba(255,255,255,0.10); margin:0;"></div>
 
+              <div class="px-3 py-4 d-flex justify-content-center">
+                <button type="submit" class="btn pf-btn pf-btn-primary" id="fert-submit-btn"
+                        style="min-width:260px; font-size:15px;" disabled>
+                  ✨ Get Fertilizer Recommendation
+                </button>
+              </div>
 
+            </form>
+          </div>
+        </div>
 
-</style>
-<!--Form Section-->
+        <!-- Legend -->
+        <div class="row mt-3">
+          <div class="col-md-4">
+            <div class="card pf-card">
+              <div class="card-body py-2 px-3 d-flex align-items-center" style="gap:10px;">
+                <span style="font-size:20px;">🌱</span>
+                <div>
+                  <div style="font-weight:900;color:#22c55e;font-size:13px;">Nitrogen (N)</div>
+                  <div class="pf-form-section-sub">Drives leaf and stem growth</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card pf-card">
+              <div class="card-body py-2 px-3 d-flex align-items-center" style="gap:10px;">
+                <span style="font-size:20px;">💧</span>
+                <div>
+                  <div style="font-weight:900;color:#38bdf8;font-size:13px;">Phosphorus (P)</div>
+                  <div class="pf-form-section-sub">Supports root &amp; flower development</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card pf-card">
+              <div class="card-body py-2 px-3 d-flex align-items-center" style="gap:10px;">
+                <span style="font-size:20px;">⚡</span>
+                <div>
+                  <div style="font-weight:900;color:#fbbf24;font-size:13px;">Potassium (K)</div>
+                  <div class="pf-form-section-sub">Strengthens disease resistance</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<div class="mukul">
-  <div class ="container">
-    <div class ="row">
-      <div class="col-md-5">
-        <h2 style="text-align: center; margin-top: 200px; color: black;">
-          <b>Obtain knowledgeable fertilizer advice based on your soil.</b></br>
-        </h2><br>
       </div>
-
-      <!--
-<br /><br />
-<h2 style="text-align: center; margin: 0px; color: black">
-  <b>Obtain knowledgeable fertilizer advice based on your soil</b>
-</h2>
-<br />
--->
-<div class="col-md-7 " style="margin-top:70px">
-<div
-  style="
-    width: 350px;
-    height: 38rem;
-    margin: 0px auto;
-    color: black;
-    border-radius: 25px;
-    padding: 10px 10px;
-  "
->
-
-  <form method="POST" action="{{ url_for('fert_recommend') }}">
-   
-    <div class="form-group">
-      <label for="Nitrogen" style="font-size: 17px"><b>Nitrogen</b></label>
-      <input
-        type="number"
-        class="form-control"
-        id="Nitrogen"
-        name="nitrogen"
-        placeholder="Enter the value (example:50)"
-        style="font-weight: bold"
-        required
-      />
-    </div>
-    <div class="form-group">
-      <label for="Phosphorous" style="font-size: 17px"
-        ><b>Phosphorous</b></label
-      >
-      <input
-        type="number"
-        class="form-control"
-        id="Phosphorous"
-        name="phosphorous"
-        placeholder="Enter the value (example:50)"
-        style="font-weight: bold"
-        required
-      />
     </div>
 
-    <div class="form-group">
-      <label for="Pottasium" style="font-size: 17px"><b>Pottasium</b></label>
-      <input
-        type="number"
-        class="form-control"
-        id="Pottasium"
-        name="pottasium"
-        placeholder="Enter the value (example:50)"
-        style="font-weight: bold"
-        required
-      />
-    </div>
-    <!-- <div class="form-group">
-      <label for="ph" style="font-size: 17px"><b>ph level</b></label>
-      <input
-        type="text"
-        class="form-control"
-        id="ph"
-        name="ph"
-        placeholder="Enter the value"
-        style="font-weight: bold"
-        required
-      />
-    </div> -->
-    <div class="form-group">
-      <label for="crop" style="font-size: 17px"
-        ><b>Crop you want to grow</b></label
-      >
-      <select
-        name="cropname"
-        class="form-control"
-        id="crop"
-        placeholder="Select a crop"
-        style="font-weight: bold"
-        required
-      >
-        <option selected>Select crop</option>
-        <option>rice</option>
-        <option>maize</option>
-        <option>chickpea</option>
-        <option>kidneybeans</option>
-        <option>pigeonpeas</option>
-        <option>mothbeans</option>
-        <option>mungbean</option>
-        <option>blackgram</option>
-        <option>lentil</option>
-        <option>pomegranate</option>
-        <option>banana</option>
-        <option>mango</option>
-        <option>grapes</option>
-        <option>watermelon</option>
-        <option>muskmelon</option>
-        <option>apple</option>
-        <option>orange</option>
-        <option>papaya</option>
-        <option>coconut</option>
-        <option>cotton</option>
-        <option>jute</option>
-        <option>coffee</option>
-      </select>
-    </div>
+  </div>
+</section>
 
-    <div class="d-flex justify-content-center">
-      <button
-        type="submit"
-        class="btn btn-info"
-        style="
-          color: black;
-          font-weight: bold;
-          width: 130px;
-          height: 50px;
-          border-radius: 12px;
-          font-size: 21px;
-        "
-      >
-        Suggest
-      </button>
-    </div>
-  
-  </form>
-</div>
-</div>
-</div>
-</div>
-</div>
+<script>
+  function selectCrop(el){
+    document.querySelectorAll('.pf-crop-tile').forEach(function(t){ t.classList.remove('selected'); });
+    el.classList.add('selected');
+    var name = el.dataset.crop;
+    document.getElementById('cropname-hidden').value = name;
+    document.getElementById('selected-crop-label').textContent = name.charAt(0).toUpperCase() + name.slice(1) + ' selected';
+    document.getElementById('fert-submit-btn').removeAttribute('disabled');
+  }
+</script>
+
 {% endblock %}

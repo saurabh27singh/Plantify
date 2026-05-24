@@ -1,17 +1,42 @@
 {% extends 'layout.html' %} {% block body %}
 
+<section class="pf-center">
+  <div class="pf-analysis">
+    <div class="pf-analysis-header">
+      <div class="pf-app-icon"><span class="fa fa-flask"></span></div>
+      <div class="pf-analysis-title">Fertilizer Recommendation</div>
+      <div class="pf-analysis-subtitle">Based on your soil nutrient levels</div>
+    </div>
 
-
-
-
-
-<div class="container py-2 mx-auto my-50 h-10 " style="margin: 9rem;">
-  <div class="row">
-      <div class="col-sm py-2 py-md-3">
-          <div class="card card-body" style="justify-content: center; background-color:blanchedalmond">
-               <p class="text-center" style="color: black; font-size: 20px;">{{ recommendation }}</p>
-          </div>
+    <div class="pf-analysis-body">
+      <div class="pf-panel">
+        <div class="pf-analysis-subtitle" style="font-size:12px; font-weight:900; color: rgba(11,18,32,0.55); margin-bottom:10px;">
+          YOUR INPUTS
+        </div>
+        <div class="pf-metrics">
+          <div class="pf-metric"><div class="n">{{ N }}</div><div class="l">Nitrogen (N)</div></div>
+          <div class="pf-metric"><div class="n">{{ P }}</div><div class="l">Phosphorous (P)</div></div>
+          <div class="pf-metric"><div class="n">{{ K }}</div><div class="l">Potassium (K)</div></div>
+          <div class="pf-metric"><div class="n">{{ crop_name }}</div><div class="l">Crop</div></div>
+        </div>
       </div>
+
+      <div class="pf-divider"></div>
+
+      <div class="pf-panel">
+        <div class="pf-analysis-subtitle" style="font-size:12px; font-weight:900; color: rgba(11,18,32,0.55); margin-bottom:10px;">
+          RECOMMENDATION
+        </div>
+        <div style="color: rgba(11,18,32,0.86); font-weight: 650; letter-spacing: 0.2px; line-height: 1.7;">
+          {{ recommendation }}
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-actions">
+      <a class="btn pf-action-btn pf-action-primary" href="{{ url_for('fertilizer_recommendation') }}">Try Again</a>
+      <a class="btn pf-action-btn pf-action-ghost" href="{{ url_for('home') }}">Home</a>
+    </div>
   </div>
-</div>
+</section>
 {% endblock %}
